@@ -6,21 +6,30 @@ import classes from './App.module.css';
 import QuestionCard from "./Components/Question_card/Question_card"
 
 //functions
-import {fetch_quiz_questions} from "./API"
+import { fetch_quiz_questions, Question_state } from "./API"
 
 //types
-import {Difficulty} from "./API"
+import { Difficulty } from "./API"
 
 const TOTAL_QUESTIONS = 10;
 
 const App = () => {
 
-  console.log(fetch_quiz_questions(TOTAL_QUESTIONS, Difficulty.EASY))
+  console.log(fetch_quiz_questions(TOTAL_QUESTIONS, Difficulty.EASY))//call the api method to fetch the quiz questions and answers
+
+  type User_answer = {//define the type of question which the user can answer and its properties
+
+    question: string,
+    answer: string,
+    correct: boolean,
+    correct_answer: string
+
+  }
 
   const [loading, set_loading] = useState(false);
-  const [questions, set_questions] = useState([]);
+  const [questions, set_questions] = useState<Question_state[]>([]);//set the type of the question state to a questionstate array
   const [current_question_number, set_current_question_number] = useState(0);
-  const [user_answers, set_user_answers] = useState([]);
+  const [user_answers, set_user_answers] = useState<User_answer[]>([]);
   const [score, set_score] = useState(0);
   const [game_over, set_game_over] = useState(true);
 
@@ -47,7 +56,7 @@ const App = () => {
       <button className={classes.start_button} onClick={() => start_quiz()}>Start</button>
       <p className={classes.score}>Score :</p>
       <p className={classes.loading_text}>Loading questions ...</p>
-{/* 
+      {/* 
       <QuestionCard
 
         question_number={current_question_number + 1} 
