@@ -48,17 +48,17 @@ const App = () => {
 
   const check_answer = (e: React.MouseEvent<HTMLButtonElement>) => {
 
-    if(game_over) return false//if its game over, dont run the function
+    if (game_over) return false//if its game over, dont run the function
 
     const answer = e.currentTarget.value//extract the selected answer
     const answer_is_correct = answer === questions[current_question_number].correct_answer//determine if the answer is correct
 
-    const current_answer:User_answer = {
+    const current_answer: User_answer = {
 
       question: questions[current_question_number].question,
-      answer:answer,
-      correct:answer_is_correct,
-      correct_answer:questions[current_question_number].correct_answer
+      answer: answer,
+      correct: answer_is_correct,
+      correct_answer: questions[current_question_number].correct_answer
 
     }
 
@@ -66,10 +66,22 @@ const App = () => {
 
     set_user_answers([...user_answers, current_answer])
 
-    set_current_question_number(current_question_number +1)
+    if (current_question_number === 9) return finish_quiz()
+
+    else set_current_question_number(current_question_number + 1)
 
   }
 
+  const finish_quiz = () => {
+
+    alert("You scored " + score + " out of " + TOTAL_QUESTIONS)
+    set_game_over(true)
+
+
+
+    console.log("finished")
+
+  }
 
   return (
 
