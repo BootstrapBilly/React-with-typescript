@@ -15,8 +15,6 @@ const TOTAL_QUESTIONS = 10;
 
 const App = () => {
 
-  console.log(fetch_quiz_questions(TOTAL_QUESTIONS, Difficulty.EASY))//call the api method to fetch the quiz questions and answers
-
   type User_answer = {//define the type of question which the user can answer and its properties
 
     question: string,
@@ -35,40 +33,82 @@ const App = () => {
 
   const start_quiz = async () => {
 
-    console.log("started")
+    set_loading(true);//set the loading to true
+    set_game_over(false);//reset the gameover state
+
+    const new_questions = await fetch_quiz_questions(TOTAL_QUESTIONS, Difficulty.EASY);//fetch the questions from the api
+
+    set_questions(new_questions);//once they have been fetched, set the question state to the questions fetched from the api
+    set_score(0);//initialise the score as 0
+    set_user_answers([]);//clear the user answers
+    set_current_question_number(0);//set the current question to 0
+    set_loading(false);//set the loading to false
+
   }
 
   const check_answer = (e: React.MouseEvent<HTMLButtonElement>) => {
 
+    if(game_over) return false//if its game over, dont run the function
+
+    const answer = e.currentTarget.value//extract the selected answer
+    const answer_is_correct = answer === questions[current_question_number].correct_answer//determine if the answer is correct
+
+    const current_answer:User_answer = {
+
+      question: questions[current_question_number].question,
+      answer:answer,
+      correct:answer_is_correct,
+      correct_answer:questions[current_question_number].correct_answer
+
+    }
+
+    answer_is_correct && set_score(score + 1)
+
+    set_user_answers([...user_answers, current_answer])
+
+    set_current_question_number(current_question_number +1)
 
   }
 
-  const next_question = () => {
-
-
-  }
 
   return (
 
     <div className={classes.container}>
 
       <h1>Typescript react quiz</h1>
-      <button className={classes.start_button} onClick={() => start_quiz()}>Start</button>
-      <p className={classes.score}>Score :</p>
-      <p className={classes.loading_text}>Loading questions ...</p>
-      {/* 
-      <QuestionCard
 
-        question_number={current_question_number + 1} 
-        total_questions={TOTAL_QUESTIONS}
-        question={questions[current_question_number].question}
-        answers={questions[current_question_number].answers}
-        user_answer={user_answers ? user_answers[current_question_number] : undefined}
-        callback={()=> check_answer}
+      {(game_over || user_answers.length === TOTAL_QUESTIONS) &&
 
-        /> */}
+        <button className={classes.start_button} onClick={() => start_quiz()}>Start</button>
 
-      <button className={classes.next_button} onClick={() => next_question()}>Next</button>
+      }
+
+      {!game_over &&
+
+        <p className={classes.score}>{`Score : ${score}`}</p>
+
+      }
+
+      {loading &&
+
+        <p className={classes.loading_text}>Loading questions ...</p>
+
+      }
+
+      {(!loading && !game_over) &&
+
+        <QuestionCard
+
+          question_number={current_question_number + 1}
+          total_questions={TOTAL_QUESTIONS}
+          question={questions[current_question_number].question}
+          answers={questions[current_question_number].answers}
+          user_answer={user_answers ? user_answers[current_question_number] : undefined}
+          callback={check_answer}
+
+        />
+
+      }
 
     </div>
 
